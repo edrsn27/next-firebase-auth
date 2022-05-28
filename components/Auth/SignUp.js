@@ -5,7 +5,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
+import Link from "next/link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -46,8 +46,8 @@ export default function SignUp() {
   const [successMessage, setSuccessMessage] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const { signUp } = useAuth();
-  const login = async (event) => {
+  const { signUp, currentUser } = useAuth();
+  const register = async (event) => {
     setLoading(true);
     event.preventDefault();
     setErrorMessage("");
@@ -83,7 +83,7 @@ export default function SignUp() {
             Sign up
           </Typography>
 
-          <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
+          <Box component="form" onSubmit={register} noValidate sx={{ mt: 1 }}>
             {successMessage && (
               <Alert severity="success">{successMessage}</Alert>
             )}
@@ -124,10 +124,7 @@ export default function SignUp() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+
             <Button
               type="submit"
               fullWidth
@@ -138,14 +135,10 @@ export default function SignUp() {
               Sign Up
             </Button>
             <Grid container>
-              <Grid item xs>
-                <Link href="#" variant="body2">
-                  {/* Forgot password? */}
-                </Link>
-              </Grid>
+              <Grid item xs></Grid>
               <Grid item>
-                <Link href="#" variant="body2">
-                  {/* {"Don't have an account? Sign Up"} */}
+                <Link href="/auth/sign-in" variant="body2">
+                  {"Already have an Account? Sign In"}
                 </Link>
               </Grid>
             </Grid>
