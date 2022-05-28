@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState } from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,7 +12,11 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import Alert from "@mui/material/Alert";
 
+// firebase signUp
+import { useAuth } from "../../context/AuthContext";
+import { async } from "@firebase/util";
 function Copyright(props) {
   return (
     <Typography
@@ -34,13 +38,30 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [loading, setLoading] = useState(false);
+  const { signUp } = useAuth();
+  const login = async (event) => {
+    setLoading(true);
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+    setErrorMessage("");
+    setSuccessMessage("");
+    if (password !== confirmPassword)
+      setErrorMessage("Password doesn't match!");
+    else
+      try {
+        await signUp(email, password);
+        setSuccessMessage("Account Creation Successful! ");
+      } catch (error) {
+        setErrorMessage(error.message);
+      }
+    setLoading(false);
   };
 
   return (
@@ -59,14 +80,14 @@ export default function SignUp() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign up
           </Typography>
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+
+          <Box component="form" onSubmit={login} noValidate sx={{ mt: 1 }}>
+            {successMessage && (
+              <Alert severity="success">{successMessage}</Alert>
+            )}
+            {errorMessage && <Alert severity="error">{errorMessage}</Alert>}
             <TextField
               margin="normal"
               required
@@ -76,6 +97,8 @@ export default function SignUp() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
               margin="normal"
@@ -86,6 +109,20 @@ export default function SignUp() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Confirm Password"
+              type="password"
+              id="confirm-password"
+              autoComplete="current-password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -96,8 +133,9 @@ export default function SignUp() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
+              disabled={loading}
             >
-              Sign In
+              Sign Up
             </Button>
             <Grid container>
               <Grid item xs>
