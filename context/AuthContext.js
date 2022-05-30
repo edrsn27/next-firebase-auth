@@ -3,12 +3,14 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  updateEmail,
+  updatePassword,
 } from "@firebase/auth";
 import { useRouter } from "next/router";
+import { auth } from "../firebase-config";
 
 const AuthContext = createContext();
 
-import { auth } from "../firebase-config";
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -29,6 +31,13 @@ export default function AuthProvider({ children }) {
     return signOut(auth);
   }
 
+  function changeEmail(newEmail) {
+    return updateEmail(currentUser, newEmail);
+  }
+  function changePassword(newPassword) {
+    return updatePassword(currentUser, newPassword);
+  }
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
@@ -42,6 +51,6 @@ export default function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const value = { currentUser, signUp, signIn, signOutUser };
+  const value = { currentUser, signUp, signIn, signOutUser, changePassword,changeEmail };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
